@@ -1,0 +1,37 @@
+""" Flask app module """
+
+from flask import Flask, request, render_template
+from  EmotionDetection.emotion_detection import emotion_detector
+
+app = Flask(__name__)
+
+@app.route('/')
+def index_html():
+    """
+    returns render template index.html
+    """
+    return render_template('index.html')
+
+@app.route('/emotionDetector')
+def flask_app():
+    """
+    req = .json input using textToAnalyze
+    analyse = emotion_detector function to analyse req
+    return = ouput based on user input
+    """
+    req = request.args.get('textToAnalyze')
+
+    analyse = emotion_detector(req)
+
+    if analyse['dominant_emotion'] is None:
+        return "Invalid text! Please try again!"
+
+    return (f"For the given statement, the system response is 'anger': {analyse['anger']}, "
+            f"'disgust': {analyse['disgust']}, "
+            f"'fear': {analyse['fear']}, "
+            f"'joy': {analyse['joy']} and "
+            f"'sadness': {analyse['sadness']}. "
+            f"The dominant emotion is {analyse['dominant_emotion']}")
+
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0', port=5000)
